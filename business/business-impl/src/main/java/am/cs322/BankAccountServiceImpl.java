@@ -20,6 +20,19 @@ public class BankAccountServiceImpl implements BankService {
     }
     @Override
     public BankAccountDTO debit(Long accountID, double amount) {
+        Optional<BankAccount> optionalBankAccount = bankAccountRepository.findById(accountID);
+        if (optionalBankAccount.isPresent()) {
+            BankAccount account = optionalBankAccount.get();
+            account.setBalance(account.getBalance() + amount);
+            bankAccountRepository.save(account);
+            return new BankAccountDTO(account.getAccountID(), account.getBalance());
+        } else {
+            throw new RuntimeException("Account not found");
+        }
+
+    }
+    @Override
+    public BankAccountDTO credit(Long accountID, double amount) {
         Optional<BankAccount> optionalAccount = bankAccountRepository.findById(accountID);
 
         if (optionalAccount.isPresent()) {
@@ -35,17 +48,6 @@ public class BankAccountServiceImpl implements BankService {
         } else {
             throw new RuntimeException("Account not found");
         }
-    }
-    @Override
-    public BankAccountDTO credit(Long accountID, double amount) {
-        Optional<BankAccount> optionalBankAccount = bankAccountRepository.findById(accountID);
-        if (optionalBankAccount.isPresent()) {
-            BankAccount account = optionalBankAccount.get();
-            account.setBalance(account.getBalance() + amount);
-            bankAccountRepository.save(account);
-            return new BankAccountDTO(account.getAccountID(), account.getBalance());
-        } else {
-            throw new RuntimeException("Account not found");
-        }
+
     }
 }
